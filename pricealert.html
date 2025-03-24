@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trading Platform</title>
+    <style>
+      /* Pink-900 Theme */
+      :root {
+        --primary-bg: #880e4f; /* Pink-900 */
+        --secondary-bg: #fce4ec; /* Light pink background */
+        --card-bg: #f8bbd0; /* Lighter pink */
+        --text-color: #fff;
+        --btn-color: #ad1457; /* Dark pink */
+        --btn-hover: #c2185b; /* Lighter pink */
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background: var(--primary-bg);
+        color: var(--text-color);
+      }
+
+      .container {
+        max-width: 1200px;
+        width: 100%;
+        padding: 20px;
+        background: var(--secondary-bg);
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      h2 {
+        text-align: center;
+        color: var(--btn-color);
+      }
+
+      .dashboard,
+      .price-alert,
+      .sentiment {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid var(--btn-color);
+        border-radius: 5px;
+        background: var(--card-bg);
+      }
+
+      .section-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: var(--btn-color);
+        margin-bottom: 15px;
+      }
+
+      input,
+      button,
+      select {
+        width: calc(50% - 10px);
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid var(--btn-color);
+        border-radius: 5px;
+        background: var(--secondary-bg);
+        color: var(--primary-bg);
+      }
+
+      button {
+        background: var(--btn-color);
+        color: var(--text-color);
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: var(--btn-hover);
+      }
+
+      .notification {
+        color: var(--text-color);
+        background: var(--btn-color);
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        display: none;
+      }
+
+      .sentiment-score {
+        font-weight: bold;
+        padding: 10px;
+        border-radius: 5px;
+        color: var(--text-color);
+        display: inline-block;
+      }
+
+      .positive {
+        background: #4caf50; /* Green */
+      }
+
+      .neutral {
+        background: #ffc107; /* Yellow */
+      }
+
+      .negative {
+        background: #f44336; /* Red */
+      }
+
+      .metrics {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .metric {
+        flex: 1;
+        margin: 10px;
+        padding: 15px;
+        background: var(--card-bg);
+        border-radius: 5px;
+        text-align: center;
+        color: var(--primary-bg);
+      }
+
+      .metric h3 {
+        font-size: 18px;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>📊 Trading Platform Simulation</h2>
+
+      <!-- Price Alert Section -->
+      <div class="price-alert">
+        <div class="section-title">Price Alerts</div>
+        <p>Current Price: <span id="price">$0.00</span></p>
+        <input type="number" id="alertPrice" placeholder="Set alert price" />
+        <button onclick="setAlert()">Set Alert</button>
+        <div id="notification" class="notification"></div>
+      </div>
+
+      <!-- Sentiment Analysis Section -->
+      <div class="sentiment">
+        <div class="section-title">Sentiment Analysis</div>
+        <p>
+          Current Sentiment:
+          <span id="sentiment" class="sentiment-score">Neutral</span>
+        </p>
+      </div>
+
+      <!-- Analytics Dashboard -->
+      <div class="dashboard">
+        <div class="section-title">Analytics Dashboard</div>
+        <div class="metrics">
+          <div class="metric">
+            <h3>Moving Average (MA)</h3>
+            <p id="ma">$0.00</p>
+          </div>
+          <div class="metric">
+            <h3>Volatility</h3>
+            <p id="volatility">$0.00</p>
+          </div>
+          <div class="metric">
+            <h3>RSI (Relative Strength Index)</h3>
+            <p id="rsi">50</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentPrice = (Math.random() * 200).toFixed(2);
+      let alertPrice = null;
+
+      const priceElement = document.getElementById("price");
+      const notificationElement = document.getElementById("notification");
+      const sentimentElement = document.getElementById("sentiment");
+      const maElement = document.getElementById("ma");
+      const volatilityElement = document.getElementById("volatility");
+      const rsiElement = document.getElementById("rsi");
+
+      // Update Price every 3 seconds
+      function updatePrice() {
+        currentPrice = (Math.random() * 200).toFixed(2);
+        priceElement.textContent = `$${currentPrice}`;
+
+        // Check for alert trigger
+        if (alertPrice && parseFloat(currentPrice) >= alertPrice) {
+          notificationElement.textContent = `🚀 Price hit $${alertPrice}! Current: $${currentPrice}`;
+          notificationElement.style.display = "block";
+        } else {
+          notificationElement.style.display = "none";
+        }
+
+        // Update analytics metrics
+        updateAnalytics();
+        updateSentiment();
+      }
+
+      // Set Alert Function
+      function setAlert() {
+        const input = document.getElementById("alertPrice").value;
+        alertPrice = parseFloat(input);
+
+        if (!isNaN(alertPrice)) {
+          alert(`✅ Alert set at $${alertPrice}`);
+        } else {
+          alert("❌ Please enter a valid number!");
+        }
+      }
+
+      // Update Sentiment
+      function updateSentiment() {
+        const sentimentScores = ["positive", "neutral", "negative"];
+        const randomSentiment =
+          sentimentScores[Math.floor(Math.random() * sentimentScores.length)];
+
+        sentimentElement.textContent =
+          randomSentiment.charAt(0).toUpperCase() + randomSentiment.slice(1);
+        sentimentElement.className = `sentiment-score ${randomSentiment}`;
+      }
+
+      // Update Analytics Metrics
+      function updateAnalytics() {
+        const prices = Array.from({ length: 20 }, () =>
+          (Math.random() * 200).toFixed(2)
+        );
+
+        // Moving Average Calculation
+        const movingAverage = (
+          prices.reduce((sum, val) => sum + parseFloat(val), 0) / prices.length
+        ).toFixed(2);
+        maElement.textContent = `$${movingAverage}`;
+
+        // Volatility Calculation
+        const max = Math.max(...prices.map(parseFloat));
+        const min = Math.min(...prices.map(parseFloat));
+        const volatility = (max - min).toFixed(2);
+        volatilityElement.textContent = `$${volatility}`;
+
+        // RSI Calculation (Random Value Simulation)
+        const rsi = (Math.random() * 100).toFixed(2);
+        rsiElement.textContent = rsi;
+      }
+
+      // Start the price updates
+      setInterval(updatePrice, 3000);
+      updatePrice();
+    </script>
+  </body>
+</html>
